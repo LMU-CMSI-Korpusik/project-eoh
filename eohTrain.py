@@ -25,8 +25,7 @@ label: a label that marks the article as potentially unreliable
 
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC
+
 
 from wordcloud import WordCloud
 
