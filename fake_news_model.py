@@ -13,7 +13,11 @@ import pandas as pd
 import numpy as np 
 import re
 
-train_dir = "data/train.csv"
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+
+nltk.download('wordnet')
+
+train_dir = "train.csv"
 df = pd.read_csv(train_dir)
 
 df = df.dropna()
@@ -51,14 +55,38 @@ y = np.array(y)
 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model = Sequential()
-model.add(Embedding(vocab_size, embedding_feature_len, input_length=max_sent_len))
+model.add(Embedding(input_dim=vocab_size, output_dim=embedding_feature_len))
 model.add(SpatialDropout1D(rate=0.2))
 model.add(LSTM(units=128))
-model.add(Dense(units=1))
-model.add(Activation("sigmoid"))
+model.add(Dense(units=1, activation='sigmoid'))
 model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
 print(model.summary())
 
 hist = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test))
 
-y_pred = model.predict_classes(x_test)
+y_pred_prob = model.predict(x_test)
+y_pred = (y_pred_prob > 0.5).astype(int)
+
+
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+# Calculate precision
+precision = precision_score(y_test, y_pred)
+
+# Calculate recall
+recall = recall_score(y_test, y_pred)
+
+# Calculate F1-score
+f1 = f1_score(y_test, y_pred)
+
+# Calculate confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1 Score:", f1)
+print("Confusion Matrix:")
+print(conf_matrix)
